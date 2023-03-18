@@ -23,27 +23,25 @@
 
 	function handleOnLoad(e) {
 		e.preventDefault()
+		const formData = new FormData(e.target)
 
-		const formData = new FormData(e.target);
-		for (const key of formData.values()) {
-			// console.log(key)A
-			
-			// console.log(formData[key])
-			// songs.push(key)
-		}
-		
-		console.log(formData['url']);
-		// console.log(formData)
-		console.log('hanad')
+		const url = formData.get('url')
+
+		console.log(window)
+
+		API.loadSongs()
+
+		console.log(url)
+
 	}
 </script>
 
 <main>
 
 	<form on:submit={handleOnLoad}>
-		<label id="url">
+		<label>
 			URL
-			<input type="text" id="url" />
+			<input type="text" name="url" value="https://www.youtube.com/playlist?list=PLmn6qDvodtX4BR2ppVlB4nTlAAlBuwIPo" />
 		</label>
 		<Button type="submit">Load</Button>
 	</form>
