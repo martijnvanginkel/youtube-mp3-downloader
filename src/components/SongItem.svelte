@@ -1,10 +1,12 @@
 <script>
 	export let title
+    export let url
 </script>
 
 <label>
     {title}
-    <input type="checkbox" name={title}>
+    {url}
+    <input type="checkbox" name={url}>
 </label>
 
 <style>
