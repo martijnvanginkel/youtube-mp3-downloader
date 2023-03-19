@@ -1,14 +1,23 @@
 <script>
-	import List from './components/List.svelte'
+	import SongItem from './components/SongItem.svelte'
 	import Button from './components/Button.svelte'
 
-	const items = [
-		{ title: 'Song one' },
-		{ title: 'Song two' },
-		{ title: 'Song three' }
-	]
+	let songs = []
 
-	function handleOnSubmit(e) {
+	function handleOnLoad(e) {
+		e.preventDefault()
+		const formData = new FormData(e.target)
+
+		const url = formData.get('url')
+
+		API.getSongs(url).then(data => {
+			songs = data
+		}).catch(err => {
+			songs = []
+		})
+	}
+
+	function handleOnDownload(e) {
 		e.preventDefault();
 
 		const formData = new FormData(e.target);
@@ -21,19 +30,16 @@
 		console.log(songs)
 	}
 
-	function handleOnLoad(e) {
-		e.preventDefault()
-		const formData = new FormData(e.target)
+	function handleOnChooseFolder() {
+		console.log('output folder')
 
-		const url = formData.get('url')
+		API.chooseFolder().then(chosenFolder => {
 
-		console.log(window)
-
-		API.loadSongs()
-
-		console.log(url)
-
+		}).catch(err => {
+			
+		})
 	}
+
 </script>
 
 <main>
@@ -45,11 +51,16 @@
 		</label>
 		<Button type="submit">Load</Button>
 	</form>
+	{#if songs.length > 0}
+		<form on:submit={handleOnDownload}>
+			{#each songs as song}
+				<SongItem title={song.title} />
+			{/each}
+			<Button type="submit">Download</Button>
+		</form>
 
-	<form on:submit={handleOnSubmit}>
-		<List {items} />
-		<Button type="submit">Download</Button>
-	</form>
+		<Button type="button" on:click={handleOnChooseFolder}>Output folder</Button>
+	{/if}
 </main>
 
 <style>
@@ -59,8 +70,8 @@ main {
 }
 
 form {
-	background-color: var(--color-dark);
-    padding: var(--spacing-m);
+	/* background-color: var(--color-dark); */
+    /* padding: var(--spacing-m); */
     /* border: 1px solid var(--color-white); */
 }
 

@@ -2,7 +2,7 @@
 
 </script>
 
-<button {...$$restProps}><slot /></button>
+<button {...$$restProps} on:click><slot /></button>
 
 <style>
 

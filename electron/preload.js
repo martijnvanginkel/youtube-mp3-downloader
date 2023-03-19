@@ -1,7 +1,8 @@
 const { ipcRenderer, contextBridge } = require("electron")
 
 const API = {
-    loadSongs: () => ipcRenderer.invoke("loadSongs")
+    chooseFolder: () => ipcRenderer.invoke("chooseFolder"),
+    getSongs: (url) => ipcRenderer.invoke("getSongs", url)
 }
 
 contextBridge.exposeInMainWorld("API", API)
