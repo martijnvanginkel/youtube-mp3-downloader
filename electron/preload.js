@@ -1,7 +1,7 @@
 const { ipcRenderer, contextBridge } = require("electron")
 
 const API = {
-    chooseFolder: () => ipcRenderer.invoke("choose-folder"),
+    pickFolder: () => ipcRenderer.invoke("pick-folder"),
     getSongs: ({ url }) => ipcRenderer.invoke("get-songs", { url }),
     downloadSongs: async ({ songUrls, outputFolder, responseCb }) => {
 
@@ -14,6 +14,5 @@ const API = {
         return true
     }
 }
-
 
 contextBridge.exposeInMainWorld("API", API)

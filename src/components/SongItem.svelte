@@ -1,22 +1,26 @@
 <script>
-    import SpinnerIcon from './SpinnerIcon.svelte'
-
     export let title
     export let url
     export let state
 </script>
 
-<label>
+<label
+    class:loading={state === 'loading'}
+    class:completed={state === 'completed'}
+    class:failed={state === 'failed'}
+>
     {title}
     {url}
-    {#if state === 'loading'}
-        <SpinnerIcon />
-    {:else if state === 'completed'}
-        Completed
-    {:else if state === 'failed'} 
-        Failed 
-    {/if}
-    <input type="checkbox" name={url} />
+    <div class="status">
+        {#if state === 'loading'}
+            Downloading...
+        {:else if state === 'completed'}
+            Completed
+        {:else if state === 'failed'} 
+            Failed 
+        {/if}
+    </div>
+    <input type="checkbox" name={url} disabled={state !== 'default'} />
 </label>
 
 <style>
@@ -27,19 +31,33 @@ label {
     justify-content: space-between;
     padding: var(--spacing-m);
     cursor: pointer;
+    margin-block-end: var(--spacing-s);
+}
+
+.loading {
+    background-color: blue;
+}
+
+.completed {
+    background-color: green;
+}
+
+.failed {
+    background-color: red;
 }
 
 label:focus-within {
-    outline: 2px solid blue;
+    outline-width: 2px;
+    outline-style: solid;
+    outline-offset: 2px;
+    outline-color: orange;
 }
 
 label:has(input:checked) {
     color: white;
-    background-color: black;
 }
 
 label:has(input:disabled) {
-    background: gray;
     cursor: not-allowed;
 }
 

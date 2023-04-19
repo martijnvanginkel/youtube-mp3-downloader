@@ -3,11 +3,15 @@
 <style>
 
 button {
-    padding: var(--spacing-s) var(--spacing-m);
+    padding: var(--spacing-s) var(--spacing-l);
     background-color: var(--color-dark);
-    border: 1px solid var(--color-yellow);
-    color: var(--color-yellow);
+    border-width: 2px;
+    border-style: solid;
+    border-color: var(--color-white);
+    color: var(--color-white);
     cursor: pointer;
+    border-radius: 2px;
+    font-size: 16px;
 }
 
 button:disabled {
@@ -15,10 +19,16 @@ button:disabled {
     cursor: not-allowed;
 }
 
-button:hover:not(:disabled) {
-    background-color: var(--color-yellow);
-    color: var(--color-dark);
+button:focus {
+    outline-width: 2px;
+    outline-style: solid;
+    outline-offset: 2px;
+    outline-color: orange;
 }
 
+button:hover:not(:disabled) {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+}
 
 </style>

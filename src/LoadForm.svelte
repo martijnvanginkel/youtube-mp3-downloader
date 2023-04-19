@@ -20,7 +20,7 @@
 					state: 'default'
 				}
 			})
-		}).catch(err => {
+		}).catch(() => {
 			songs = {}
 		}).finally(() => {
             dispatch('songs-loaded', { songs })
@@ -30,19 +30,28 @@
 
 <form on:submit={handleOnLoad}>
     <label>
-        URL
+        Youtube playlist url
         <input type="text" name="url" value="https://www.youtube.com/playlist?list=PLmn6qDvodtX4BR2ppVlB4nTlAAlBuwIPo" />
     </label>
-    <Button type="submit">Load</Button>
+    <Button type="submit">Load songs</Button>
 </form>
 
 <style>
+	form {
+		display: flex;
+	}
+
 	label {
-		color: white;
+		color: var(--color-white);
+		flex-grow: 1;
+		margin-inline-end: var(--spacing-l);
 	}
 
 	input {
 		inline-size: 100%;
-		padding: 4px;
+		margin-block-start: var(--spacing-s);
+		padding: var(--spacing-s);
+		border: 0;
+		border-radius: 2px;
 	}
 </style>

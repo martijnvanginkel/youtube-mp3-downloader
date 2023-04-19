@@ -13,7 +13,7 @@ app.on("ready", () => {
     mainWindow.loadFile(path.join(__dirname, "../public/index.html"));
     mainWindow.webContents.openDevTools();
 
-    ipcMain.handle("choose-folder", async () => {    
+    ipcMain.handle("pick-folder", async () => {    
         const filePath = await dialog.showOpenDialog(mainWindow, { properties: ['openDirectory'] })
             .then(result => {
                 if (result.canceled) {
@@ -23,7 +23,7 @@ app.on("ready", () => {
             })
         
         if (!filePath) {
-            throw new Error('Something went wrong choosing a folder')
+            throw new Error('Something went wrong picking a folder')
         }
 
         return filePath
@@ -33,7 +33,8 @@ app.on("ready", () => {
         for (let index = 0; index < songUrls.length; index++) {
             const songUrl = songUrls[index];
             await new Promise(res => setTimeout(res, 1000))
-            mainWindow.webContents.send("download-response", { songUrl, statusCode: 200 })
+
+            mainWindow.webContents.send("download-response", { songUrl, statusCode: (Math.random() > 0.5) ? 200 : 500 })
         }
 
         return true

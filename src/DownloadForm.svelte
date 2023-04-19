@@ -6,31 +6,20 @@
     export let outputFolder
 
     let isDownloading = false
-
-    // $: doubled = count * 2;
-    
     $: sortedSongs = Object.values(songs).sort((a, b) => a.index < b.index ? -1 : (a.index > b.index) ? 1 : 0)
 
     function responseCb({ songUrl, statusCode }) {
-        console.log('callback ', songUrl, statusCode)
-
         if (statusCode === 200) {
             songs[songUrl].state = 'completed'
             return
         }
 
-        songs[songUrl]
-
+        songs[songUrl].state = 'failed'
     }
 
 	async function handleOnDownload(e) {
-        isDownloading = true
-
-        // songs.forEach(song => {
-        //     song.state = 'loading'
-        // })
-        
 		e.preventDefault();
+        isDownloading = true        
 
         if (!outputFolder || outputFolder.length === 0) {
             // do an alert or something to say you need to pick an output folder
@@ -42,8 +31,8 @@
       
 		for (const key of formData.keys()) {
 			songUrls.push(key)
+            songs[key].state = 'loading'
 		}
-
 
 		await API.downloadSongs({ songUrls, outputFolder, responseCb })
 
@@ -58,9 +47,3 @@
     {/each}
     <Button type="submit" disabled={isDownloading}>Download</Button>
 </form>
-
-<style>
-    form {
-        margin-block-start: 16px;
-    }
-</style>
