@@ -1,7 +1,3 @@
-<script>  
-
-</script>
-
 <button {...$$restProps} on:click><slot /></button>
 
 <style>
@@ -14,9 +10,15 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+button:disabled {
+    background-color: lightgray;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
     background-color: var(--color-yellow);
     color: var(--color-dark);
 }
+
 
 </style>

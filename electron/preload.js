@@ -1,24 +1,18 @@
 const { ipcRenderer, contextBridge } = require("electron")
 
 const API = {
-    chooseFolder: () => ipcRenderer.invoke("chooseFolder"),
-    getSongs: ({ url }) => ipcRenderer.invoke("getSongs", { url }),
-    downloadSongs: ({ songs, outputFolder, callback }) => {
+    chooseFolder: () => ipcRenderer.invoke("choose-folder"),
+    getSongs: ({ url }) => ipcRenderer.invoke("get-songs", { url }),
+    downloadSongs: async ({ songUrls, outputFolder, responseCb }) => {
 
-        // function downloadCb() {
+        const handler = (e, { songUrl, statusCode }) => responseCb({ songUrl, statusCode})
 
-        //     ipcRenderer.on("song-downloaded", () => console.log('downloaded'))
-        // }
+        ipcRenderer.on("download-response", handler)
+        await ipcRenderer.invoke("download-songs", { songUrls, outputFolder })
 
-        ipcRenderer.on("song-downloaded", () => {
-            callback()
-        })
-
-
-        ipcRenderer.invoke("downloadSongs", { songs, outputFolder })
-    },
-
-    
+        ipcRenderer.removeAllListeners("download-response", handler)
+        return true
+    }
 }
 
 

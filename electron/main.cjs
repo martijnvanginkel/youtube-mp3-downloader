@@ -3,8 +3,8 @@ const path = require("path");
 
 app.on("ready", () => {    
     const mainWindow = new BrowserWindow({
-        width: 600,
-        height: 400,
+        width: 900,
+        height: 600,
         autoHideMenuBar: true,
         webPreferences: {
             preload: path.join(__dirname, "./preload.js"),
@@ -13,8 +13,7 @@ app.on("ready", () => {
     mainWindow.loadFile(path.join(__dirname, "../public/index.html"));
     mainWindow.webContents.openDevTools();
 
-    ipcMain.handle("chooseFolder", async () => {
-    
+    ipcMain.handle("choose-folder", async () => {    
         const filePath = await dialog.showOpenDialog(mainWindow, { properties: ['openDirectory'] })
             .then(result => {
                 if (result.canceled) {
@@ -22,8 +21,6 @@ app.on("ready", () => {
                 }
                 return result.filePaths[0]
             })
-
-        console.log(filePath, 'ehasdfasdf')
         
         if (!filePath) {
             throw new Error('Something went wrong choosing a folder')
@@ -32,36 +29,23 @@ app.on("ready", () => {
         return filePath
     })
 
-    ipcMain.handle("downloadSongs", async (e, { songs, outputFolder }) => {
-    
-
-        let max = 10
-
-        for (let index = 0; index < max; index++) {
-            // const element = array[index];
-
-            await new Promise(resolve => setTimeout(resolve, 1000))
-
-            mainWindow.webContents.send("song-downloaded")
-            console.log('hoi')
-            
-            
+    ipcMain.handle("download-songs", async (e, { songUrls, outputFolder }) => {
+        for (let index = 0; index < songUrls.length; index++) {
+            const songUrl = songUrls[index];
+            await new Promise(res => setTimeout(res, 1000))
+            mainWindow.webContents.send("download-response", { songUrl, statusCode: 200 })
         }
 
-    
-        // console.log(songs, outputFolder)
+        return true
     })
 });
 
 
-ipcMain.handle("getSongs", (e, { url }) => {
-
-    console.log('get songs ', url)
-
+ipcMain.handle("get-songs", (e, { url }) => {
     return [
-		{ title: 'Song one', url: 'youtube.com/urlone' },
-		{ title: 'Song two', url: 'youtube.com/urltwo'  },
-		{ title: 'Song three', url: 'youtube.com/urlthree' }
+		{ index: 0, title: 'Song one', url: 'youtube.com/urlone' },
+		{ index: 1, title: 'Song two', url: 'youtube.com/urltwo'  },
+		{ index: 2, title: 'Song three', url: 'youtube.com/urlthree' }
 	]
 })
 
