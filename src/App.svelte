@@ -10,7 +10,9 @@
 
 <main>
 	<FolderPicker on:picked-folder={e => outputFolder = e.detail.folderPath} />
-	<LoadForm on:songs-loaded={e => songs = e.detail.songs} />
+	<LoadForm on:songs-loaded={e => {
+		songs = Object.assign(songs, e.detail.songs)
+	}} />
 	{#if Object.keys(songs).length > 0}
 		<DownloadForm songs={songs} outputFolder={outputFolder} />
 	{/if}

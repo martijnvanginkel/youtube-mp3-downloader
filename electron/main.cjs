@@ -46,21 +46,35 @@ app.on("ready", () => {
     })
 });
 
-ipcMain.handle("get-songs", async (e, { url }) => {
+// This needs to be reset somehow with a new url
+let batches = []
+
+ipcMain.handle("get-songs", async (e, { url }) => {    
 
     try {
-        const playlist = await ytpl(url)
+
+        let batch
+
+        if (batches.length === 0) {
+            batch = await ytpl(url, { pages: 1 })
+        } else {
+            batch = await ytpl.continueReq(batches[batches.length - 1].continuation);
+        }
+        
+        batches.push(batch)
+
         return {
             statusCode: 200,
-            data: playlist.items.map(item => {
+            data: batch.items.map(item => {
                 return {
                     index: item.index,
                     title: item.title,
-                    url: item.shortUrl
+                    url: item.shortUrl 
                 }
             })
-        };
+        }
     } catch (error) {
+        console.log(error)
         return {
             statusCode: 500,
         }
