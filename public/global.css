@@ -17,4 +17,7 @@
 body {
 	font-family: 'Futura';
 	background-color: var(--color-black);
+	block-size: 100%;
+	inline-size: 100%;
+	overflow: hidden;
 }

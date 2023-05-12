@@ -7,6 +7,7 @@
 
     let isDownloading = false
     $: sortedSongs = Object.values(songs).sort((a, b) => a.index < b.index ? -1 : (a.index > b.index) ? 1 : 0)
+    $: checkedSongs = 0
 
     function responseCb({ songUrl, statusCode }) {
         if (statusCode === 200) {
@@ -18,13 +19,14 @@
     }
 
 	async function handleOnDownload(e) {
-		e.preventDefault();
-        isDownloading = true        
-
+        e.preventDefault()
+    
         if (!outputFolder || outputFolder.length === 0) {
-            // do an alert or something to say you need to pick an output folder
+            API.showMessage({ message: "Please choose an output folder", type: "info" })
             return;
         }
+
+        isDownloading = true        
 
 		const formData = new FormData(e.target)
     	const songUrls = []
@@ -42,8 +44,34 @@
 </script>
 
 <form on:submit={handleOnDownload}>
-    {#each sortedSongs as song}
-        <SongItem title={song.title} url={song.url} state={song.state} /> 
-    {/each}
-    <Button type="submit" disabled={isDownloading}>Download</Button>
+    <div class="song-items">
+        {#each sortedSongs as song}
+            <SongItem title={song.title} url={song.url} state={song.state} on:change={e => {
+                e.detail.checked === true ? checkedSongs++ : checkedSongs--;
+             }} /> 
+        {/each}
+    </div>
+    <div>
+        <Button type="submit" disabled={isDownloading || checkedSongs === 0} class="button">Download</Button>
+    </div>
 </form>
+
+<style>
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.song-items {
+    padding-block: var(--spacing-s);
+    padding-inline: var(--spacing-s) var(--spacing-l);
+    flex-basis: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-block-end: var(--spacing-l);
+}
+
+</style>

@@ -1,6 +1,7 @@
 const { ipcRenderer, contextBridge } = require("electron")
 
 const API = {
+    showMessage: ({ message, type }) => ipcRenderer.invoke("show-message", { message, type }),
     pickFolder: () => ipcRenderer.invoke("pick-folder"),
     getSongs: ({ url }) => ipcRenderer.invoke("get-songs", { url }),
     downloadSongs: async ({ songUrls, outputFolder, responseCb }) => {

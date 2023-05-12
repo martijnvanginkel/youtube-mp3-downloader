@@ -1,7 +1,11 @@
 <script>
+    import { createEventDispatcher } from 'svelte';
+
     export let title
     export let url
     export let state
+
+    const dispatch = createEventDispatcher();
 </script>
 
 <label
@@ -9,8 +13,8 @@
     class:completed={state === 'completed'}
     class:failed={state === 'failed'}
 >
-    {title}
-    {url}
+    <div class="title">{title}</div>
+    <div class="url">{url}</div>
     <div class="status">
         {#if state === 'loading'}
             Downloading...
@@ -20,30 +24,37 @@
             Failed 
         {/if}
     </div>
-    <input type="checkbox" name={url} disabled={state !== 'default'} />
+    <input type="checkbox" name={url} disabled={state !== 'default'} on:change={e => {
+        dispatch('change', { checked: e.target.checked })
+    }} />
 </label>
 
 <style>
 
 label {
-    border: 1px solid var(--color-white);
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     padding: var(--spacing-m);
+    border: 1px solid var(--color-white);
     cursor: pointer;
-    margin-block-end: var(--spacing-s);
+    background-color: black;
+    color: white;
+}
+
+label:not(:last-of-type) {
+    margin-block-end: var(--spacing-m);
 }
 
 .loading {
-    background-color: blue;
+    background-color: lightskyblue;
 }
 
 .completed {
-    background-color: green;
+    background-color: green; 
 }
 
 .failed {
-    background-color: red;
+    background-color: lightcoral;
 }
 
 label:focus-within {
@@ -51,6 +62,7 @@ label:focus-within {
     outline-style: solid;
     outline-offset: 2px;
     outline-color: orange;
+    z-index: 99999;
 }
 
 label:has(input:checked) {
@@ -61,12 +73,27 @@ label:has(input:disabled) {
     cursor: not-allowed;
 }
 
+input {
+    color: white;
+}
+
 input:focus {
     outline: none;
 }
 
 input:disabled {
     display: none;
+}
+
+.title {
+    flex-grow: 1;
+}
+
+.url {
+    font-size: 12px;
+    font-style: italic;
+    align-self: flex-end;
+    margin-inline-end: var(--spacing-l);
 }
 
 </style>

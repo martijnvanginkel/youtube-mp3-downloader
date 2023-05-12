@@ -11,8 +11,8 @@
 		const formData = new FormData(e.target)
 		const url = formData.get('url')
 
-		API.getSongs({ url: url }).then(data => {
-			data.forEach(song => {
+		API.getSongs({ url: url }).then(response => {
+			response.data.forEach(song => {
 				songs[song.url] = {
 					index: song.index,
 					url: song.url,
@@ -21,6 +21,7 @@
 				}
 			})
 		}).catch(() => {
+			API.showMessage({ message: "There is something wrong with the URL", type: "error" })
 			songs = {}
 		}).finally(() => {
             dispatch('songs-loaded', { songs })
@@ -39,6 +40,9 @@
 <style>
 	form {
 		display: flex;
+		gap: 0;
+		justify-content: space-between;
+		align-items: flex-end;
 	}
 
 	label {

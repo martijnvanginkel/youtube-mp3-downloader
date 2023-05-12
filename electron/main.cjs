@@ -1,10 +1,11 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
+const ytpl = require("ytpl");
 
 app.on("ready", () => {    
     const mainWindow = new BrowserWindow({
-        width: 900,
-        height: 600,
+        width: 1280,
+        height: 900,
         autoHideMenuBar: true,
         webPreferences: {
             preload: path.join(__dirname, "./preload.js"),
@@ -14,7 +15,7 @@ app.on("ready", () => {
     mainWindow.webContents.openDevTools();
 
     ipcMain.handle("pick-folder", async () => {    
-        const filePath = await dialog.showOpenDialog(mainWindow, { properties: ['openDirectory'] })
+        const filePath = await dialog.showOpenDialog(mainWindow, { properties: ["openDirectory"] })
             .then(result => {
                 if (result.canceled) {
                     return
@@ -23,7 +24,7 @@ app.on("ready", () => {
             })
         
         if (!filePath) {
-            throw new Error('Something went wrong picking a folder')
+            throw new Error("Something went wrong picking a folder")
         }
 
         return filePath
@@ -39,14 +40,30 @@ app.on("ready", () => {
 
         return true
     })
+
+    ipcMain.handle("show-message", (e, { message, type }) => {
+        dialog.showMessageBox(mainWindow, { message, type })
+    })
 });
 
+ipcMain.handle("get-songs", async (e, { url }) => {
 
-ipcMain.handle("get-songs", (e, { url }) => {
-    return [
-		{ index: 0, title: 'Song one', url: 'youtube.com/urlone' },
-		{ index: 1, title: 'Song two', url: 'youtube.com/urltwo'  },
-		{ index: 2, title: 'Song three', url: 'youtube.com/urlthree' }
-	]
+    try {
+        const playlist = await ytpl(url)
+        return {
+            statusCode: 200,
+            data: playlist.items.map(item => {
+                return {
+                    index: item.index,
+                    title: item.title,
+                    url: item.shortUrl
+                }
+            })
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+        }
+    }
 })
 

@@ -22,7 +22,10 @@ main {
 	display: flex;
 	flex-direction: column;
 	gap: var(--spacing-l);
-	margin: var(--spacing-l);
+	block-size: 100vh;
+	max-block-size: 100vh;
+	box-sizing: border-box;
+	padding: var(--spacing-l);
 }
 
 </style>
