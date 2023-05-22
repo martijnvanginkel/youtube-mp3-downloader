@@ -44,6 +44,7 @@
 </script>
 
 <form on:submit={handleOnDownload}>
+    <div class="song-count">Songs loaded: {Object.entries(songs).length}</div>
     <div class="song-items">
         {#each sortedSongs as song}
             <SongItem title={song.title} url={song.url} state={song.state} on:change={e => {
@@ -63,6 +64,13 @@ form {
     flex-direction: column;
     justify-content: space-between;
     flex-grow: 1;
+}
+
+.song-count {
+    margin-inline-start: var(--spacing-s);
+    margin-block-end: var(--spacing-s); 
+    color: var(--color-white);
+
 }
 
 .song-items {

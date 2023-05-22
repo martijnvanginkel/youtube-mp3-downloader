@@ -3,6 +3,12 @@
     import Button from './components/Button.svelte'
 
     const dispatch = createEventDispatcher();
+	
+	let urlValue = ''
+	let loadingSongs = false
+
+	let firstBatchDone = false
+	let allBatchesLoaded = false
 
     function handleOnLoad(e) {
 		e.preventDefault()
@@ -11,7 +17,9 @@
 		const formData = new FormData(e.target)
 		const url = formData.get('url')
 
+		loadingSongs = true
 		API.getSongs({ url }).then(response => {
+			
 			response.data.forEach(song => {
 				songs[song.url] = {
 					index: song.index,
@@ -20,21 +28,38 @@
 					state: 'default'
 				}
 			})
+
+			if (response.statusCode === 200) {
+				allBatchesLoaded = true
+			} else {
+				firstBatchDone = true
+			}
+
 		}).catch(() => {
 			API.showMessage({ message: "There is something wrong with the URL", type: "error" })
 			songs = {}
 		}).finally(() => {
+			loadingSongs = false
             dispatch('songs-loaded', { songs })
 		})
 	}
+
+	function resetFormState() {
+		firstBatchDone = false
+		allBatchesLoaded = false
+		dispatch('songs-loaded', { songs: {} })	
+	}
+
 </script>
 
 <form on:submit={handleOnLoad}>
-    <label>
-        Youtube playlist url
-        <input type="text" name="url" value="https://www.youtube.com/playlist?list=PLmn6qDvodtX4gt_u8hfVCAktMHd9GYfXe" />
-    </label>
-    <Button type="submit">Load songs</Button>
+	<label>
+		Youtube playlist url
+		<input type="text" name="url" bind:value={urlValue} on:keyup={resetFormState} />
+	</label>
+	<Button type="submit" disabled={urlValue.length === 0 || loadingSongs || allBatchesLoaded}>
+		{!firstBatchDone ? 'Load songs' : 'Load more songs'}
+	</Button>
 </form>
 
 <style>

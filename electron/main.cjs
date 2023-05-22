@@ -47,31 +47,52 @@ app.on("ready", () => {
 });
 
 // This needs to be reset somehow with a new url
-let batches = []
+let nextBatch = {
+    url: undefined,
+    continuation: undefined
+}
 
-ipcMain.handle("get-songs", async (e, { url }) => {    
+ipcMain.handle("get-songs", async (e, { url }) => {
+
+    const formatItems = (items) => items.map(item => {
+        return {
+            index: item.index,
+            title: item.title,
+            url: item.shortUrl 
+        } 
+    })
+
+    if (nextBatch.url && nextBatch.url !== url) {
+        nextBatch = {
+            url: url,
+            continuation: undefined
+        }
+    }
 
     try {
+        let currentBatch
 
-        let batch
-
-        if (batches.length === 0) {
-            batch = await ytpl(url, { pages: 1 })
+        if (!nextBatch.continuation) {
+            currentBatch = await ytpl(url, { pages: 1 })
         } else {
-            batch = await ytpl.continueReq(batches[batches.length - 1].continuation);
+            currentBatch = await ytpl.continueReq(nextBatch.continuation);
         }
-        
-        batches.push(batch)
+
+        if (!currentBatch.continuation) {
+            return {
+                statusCode: 200,
+                data: formatItems(currentBatch.items) 
+            }
+        }
+
+        nextBatch = {
+            url: url,
+            continuation: currentBatch.continuation
+        }
 
         return {
-            statusCode: 200,
-            data: batch.items.map(item => {
-                return {
-                    index: item.index,
-                    title: item.title,
-                    url: item.shortUrl 
-                }
-            })
+            statusCode: 202,
+            data: formatItems(currentBatch.items)
         }
     } catch (error) {
         console.log(error)
