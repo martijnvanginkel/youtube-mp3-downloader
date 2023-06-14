@@ -1,6 +1,8 @@
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
-const path = require("path");
-const ytpl = require("ytpl");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron")
+const path = require("path")
+const ytpl = require("ytpl")
+const ytdl = require('ytdl-core')
+const fs = require('fs')
 
 app.on("ready", () => {    
     const mainWindow = new BrowserWindow({
@@ -10,9 +12,9 @@ app.on("ready", () => {
         webPreferences: {
             preload: path.join(__dirname, "./preload.js"),
         }
-    });
-    mainWindow.loadFile(path.join(__dirname, "../public/index.html"));
-    mainWindow.webContents.openDevTools();
+    })
+    mainWindow.loadFile(path.join(__dirname, "../public/index.html"))
+    mainWindow.webContents.openDevTools()
 
     ipcMain.handle("pick-folder", async () => {    
         const filePath = await dialog.showOpenDialog(mainWindow, { properties: ["openDirectory"] })
@@ -30,23 +32,45 @@ app.on("ready", () => {
         return filePath
     })
 
-    ipcMain.handle("download-songs", async (e, { songUrls, outputFolder }) => {
-        for (let index = 0; index < songUrls.length; index++) {
-            const songUrl = songUrls[index];
-            await new Promise(res => setTimeout(res, 1000))
+    ipcMain.handle("download-songs", async (e, { songs, outputFolder }) => {
+        for (let index = 0; index < songs.length; index++) {
+            const song = songs[index]
+            const options = { quality: 'highest', filter: 'audioandvideo' }
+            console.log(song)
+            
+            try {
+                await ytdl(song.url, options).pipe(fs.createWriteStream(`${song.title}.mp3`))
+                mainWindow.webContents.send("download-response", { songUrl: song.url, statusCode: 200 })
+            } catch (error) {
+                console.log()
+                mainWindow.webContents.send("download-response", { songUrl: song.url, statusCode: 500 })
+            }
+            // console.log(song)
+            // }).catch(() => {
+            // })
 
-            mainWindow.webContents.send("download-response", { songUrl, statusCode: (Math.random() > 0.5) ? 200 : 500 })
+            // try {
+            //     await ytdl(url, options).pipe(fs.createWriteStream(`${DIST_FOLDER}${title}.mp3`))
+            //     return true
+            // } catch (error) {
+            //     return false
+            // }
+
+            // console.log(songUrl)
+            // await new Promise(res => setTimeout(res, 1000))
+
+            // mainWindow.webContents.send("download-response", { song.title, statusCode: (Math.random() > 0.5) ? 200 : 500 })
         }
+        return
 
-        return true
+        // return true
     })
 
     ipcMain.handle("show-message", (e, { message, type }) => {
         dialog.showMessageBox(mainWindow, { message, type })
     })
-});
+})
 
-// This needs to be reset somehow with a new url
 let nextBatch = {
     url: undefined,
     continuation: undefined
@@ -75,7 +99,7 @@ ipcMain.handle("get-songs", async (e, { url }) => {
         if (!nextBatch.continuation) {
             currentBatch = await ytpl(url, { pages: 1 })
         } else {
-            currentBatch = await ytpl.continueReq(nextBatch.continuation);
+            currentBatch = await ytpl.continueReq(nextBatch.continuation)
         }
 
         if (!currentBatch.continuation) {
@@ -97,7 +121,7 @@ ipcMain.handle("get-songs", async (e, { url }) => {
     } catch (error) {
         console.log(error)
         return {
-            statusCode: 500,
+            statusCode: 500
         }
     }
 })

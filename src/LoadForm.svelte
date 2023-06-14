@@ -5,8 +5,9 @@
     const dispatch = createEventDispatcher();
 	
 	let urlValue = ''
-	let loadingSongs = false
+	let previousLoadUrl = ''
 
+	let loadingSongs = false
 	let firstBatchDone = false
 	let allBatchesLoaded = false
 
@@ -18,6 +19,11 @@
 		const url = formData.get('url')
 
 		loadingSongs = true
+
+		if (urlValue !== previousLoadUrl) {
+			resetFormState()
+		}
+		
 		API.getSongs({ url }).then(response => {
 			
 			response.data.forEach(song => {
@@ -40,14 +46,16 @@
 			songs = {}
 		}).finally(() => {
 			loadingSongs = false
-            dispatch('songs-loaded', { songs })
+			previousLoadUrl = urlValue
+
+            dispatch('songs-loaded', { songs, playlistUrl: urlValue })
 		})
 	}
 
 	function resetFormState() {
 		firstBatchDone = false
 		allBatchesLoaded = false
-		dispatch('songs-loaded', { songs: {} })	
+		loadingSongs = false
 	}
 
 </script>
@@ -58,7 +66,7 @@
 		<input type="text" name="url" bind:value={urlValue} on:keyup={resetFormState} />
 	</label>
 	<Button type="submit" disabled={urlValue.length === 0 || loadingSongs || allBatchesLoaded}>
-		{!firstBatchDone ? 'Load songs' : 'Load more songs'}
+		Load
 	</Button>
 </form>
 

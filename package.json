@@ -23,6 +23,7 @@
   "dependencies": {
     "node-fetch": "^2.6.1",
     "sirv-cli": "^2.0.0",
+    "ytdl-core": "^4.11.4",
     "ytpl": "^2.3.0"
   }
 }

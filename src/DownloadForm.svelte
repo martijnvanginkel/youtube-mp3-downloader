@@ -29,14 +29,15 @@
         isDownloading = true        
 
 		const formData = new FormData(e.target)
-    	const songUrls = []
+    	const exportedSongs = []
       
 		for (const key of formData.keys()) {
-			songUrls.push(key)
+			exportedSongs.push({ title: songs[key].title, url: songs[key].url})
+
             songs[key].state = 'loading'
 		}
 
-		await API.downloadSongs({ songUrls, outputFolder, responseCb })
+		await API.downloadSongs({ songs: exportedSongs, outputFolder, responseCb })
 
         isDownloading = false
 	}
