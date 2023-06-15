@@ -24,7 +24,6 @@
 </main>
 
 <style>
-
 main {
 	display: flex;
 	flex-direction: column;
@@ -34,5 +33,4 @@ main {
 	box-sizing: border-box;
 	padding: var(--spacing-l);
 }
-
 </style>

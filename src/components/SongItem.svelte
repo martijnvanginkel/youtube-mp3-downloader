@@ -30,10 +30,8 @@
 </label>
 
 <style>
-
 label {
     display: flex;
-    /* justify-content: space-between; */
     padding: var(--spacing-m);
     border: 1px solid var(--color-white);
     cursor: pointer;
@@ -95,5 +93,4 @@ input:disabled {
     align-self: flex-end;
     margin-inline-end: var(--spacing-l);
 }
-
 </style>

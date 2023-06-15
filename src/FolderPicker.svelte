@@ -3,7 +3,6 @@
     import { createEventDispatcher } from 'svelte';
 
     const dispatch = createEventDispatcher();
-
     let folderPath = ''
 
 	function handleOnPickFolder() {
@@ -33,5 +32,4 @@ span {
     color: var(--color-white);
     font-size: 12px;
 }
-
 </style>

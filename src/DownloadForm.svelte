@@ -33,7 +33,6 @@
       
 		for (const key of formData.keys()) {
 			exportedSongs.push({ title: songs[key].title, url: songs[key].url})
-
             songs[key].state = 'loading'
 		}
 
@@ -59,7 +58,6 @@
 </form>
 
 <style>
-
 form {
     display: flex;
     flex-direction: column;
@@ -82,5 +80,4 @@ form {
     overflow-y: auto;
     margin-block-end: var(--spacing-l);
 }
-
 </style>

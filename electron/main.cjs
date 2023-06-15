@@ -13,6 +13,7 @@ app.on("ready", () => {
             preload: path.join(__dirname, "./preload.js"),
         }
     })
+
     mainWindow.loadFile(path.join(__dirname, "../public/index.html"))
     mainWindow.webContents.openDevTools()
 
@@ -33,96 +34,83 @@ app.on("ready", () => {
     })
 
     ipcMain.handle("download-songs", async (e, { songs, outputFolder }) => {
-        for (let index = 0; index < songs.length; index++) {
-            const song = songs[index]
+
+        async function downloadSong(title, url) {
             const options = { quality: 'highest', filter: 'audioandvideo' }
-            console.log(song)
-            
             try {
-                await ytdl(song.url, options).pipe(fs.createWriteStream(`${song.title}.mp3`))
-                mainWindow.webContents.send("download-response", { songUrl: song.url, statusCode: 200 })
+                await ytdl(url, options).pipe(fs.createWriteStream(`${outputFolder}/${title}.mp3`))
+                mainWindow.webContents.send("download-response", { songUrl: url, statusCode: 200 })
             } catch (error) {
-                console.log()
-                mainWindow.webContents.send("download-response", { songUrl: song.url, statusCode: 500 })
+                mainWindow.webContents.send("download-response", { songUrl: url, statusCode: 500 })
             }
-            // console.log(song)
-            // }).catch(() => {
-            // })
-
-            // try {
-            //     await ytdl(url, options).pipe(fs.createWriteStream(`${DIST_FOLDER}${title}.mp3`))
-            //     return true
-            // } catch (error) {
-            //     return false
-            // }
-
-            // console.log(songUrl)
-            // await new Promise(res => setTimeout(res, 1000))
-
-            // mainWindow.webContents.send("download-response", { song.title, statusCode: (Math.random() > 0.5) ? 200 : 500 })
         }
-        return
-
-        // return true
+        
+        const downloadPromises = Array.from(songs).map(async song => await downloadSong(song.title, song.url))
+        await Promise.all(downloadPromises)
+        
+        mainWindow.webContents.send("download-done")
     })
-
+    
     ipcMain.handle("show-message", (e, { message, type }) => {
         dialog.showMessageBox(mainWindow, { message, type })
     })
+
+    handleGetSongsEvent()
 })
 
-let nextBatch = {
-    url: undefined,
-    continuation: undefined
-}
-
-ipcMain.handle("get-songs", async (e, { url }) => {
-
-    const formatItems = (items) => items.map(item => {
-        return {
-            index: item.index,
-            title: item.title,
-            url: item.shortUrl 
-        } 
-    })
-
-    if (nextBatch.url && nextBatch.url !== url) {
-        nextBatch = {
-            url: url,
-            continuation: undefined
-        }
+function handleGetSongsEvent() {
+    let nextBatch = {
+        url: undefined,
+        continuation: undefined
     }
-
-    try {
-        let currentBatch
-
-        if (!nextBatch.continuation) {
-            currentBatch = await ytpl(url, { pages: 1 })
-        } else {
-            currentBatch = await ytpl.continueReq(nextBatch.continuation)
-        }
-
-        if (!currentBatch.continuation) {
+    
+    ipcMain.handle("get-songs", async (e, { url }) => {
+    
+        const formatItems = (items) => items.map(item => {
             return {
-                statusCode: 200,
-                data: formatItems(currentBatch.items) 
+                index: item.index,
+                title: item.title,
+                url: item.shortUrl 
+            } 
+        })
+    
+        if (nextBatch.url && nextBatch.url !== url) {
+            nextBatch = {
+                url: url,
+                continuation: undefined
             }
         }
-
-        nextBatch = {
-            url: url,
-            continuation: currentBatch.continuation
+    
+        try {
+            let currentBatch
+    
+            if (!nextBatch.continuation) {
+                currentBatch = await ytpl(url, { pages: 1 })
+            } else {
+                currentBatch = await ytpl.continueReq(nextBatch.continuation)
+            }
+    
+            if (!currentBatch.continuation) {
+                return {
+                    statusCode: 200,
+                    data: formatItems(currentBatch.items) 
+                }
+            }
+    
+            nextBatch = {
+                url: url,
+                continuation: currentBatch.continuation
+            }
+    
+            return {
+                statusCode: 202,
+                data: formatItems(currentBatch.items)
+            }
+        } catch {
+            return {
+                statusCode: 500
+            }
         }
-
-        return {
-            statusCode: 202,
-            data: formatItems(currentBatch.items)
-        }
-    } catch (error) {
-        console.log(error)
-        return {
-            statusCode: 500
-        }
-    }
-})
+    })
+}
 

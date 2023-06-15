@@ -1,7 +1,6 @@
 <button {...$$restProps} on:click><slot /></button>
 
 <style>
-
 button {
     padding: var(--spacing-s) var(--spacing-l);
     background-color: var(--color-dark);
@@ -30,5 +29,4 @@ button:hover:not(:disabled) {
     background-color: var(--color-white);
     color: var(--color-dark);
 }
-
 </style>

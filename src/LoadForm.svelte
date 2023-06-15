@@ -71,24 +71,24 @@
 </form>
 
 <style>
-	form {
-		display: flex;
-		gap: 0;
-		justify-content: space-between;
-		align-items: flex-end;
-	}
+form {
+	display: flex;
+	gap: 0;
+	justify-content: space-between;
+	align-items: flex-end;
+}
 
-	label {
-		color: var(--color-white);
-		flex-grow: 1;
-		margin-inline-end: var(--spacing-l);
-	}
+label {
+	color: var(--color-white);
+	flex-grow: 1;
+	margin-inline-end: var(--spacing-l);
+}
 
-	input {
-		inline-size: 100%;
-		margin-block-start: var(--spacing-s);
-		padding: var(--spacing-s);
-		border: 0;
-		border-radius: 2px;
-	}
+input {
+	inline-size: 100%;
+	margin-block-start: var(--spacing-s);
+	padding: var(--spacing-s);
+	border: 0;
+	border-radius: 2px;
+}
 </style>
